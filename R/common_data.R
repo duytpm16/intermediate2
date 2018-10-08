@@ -50,14 +50,14 @@ common_data <- function(target = NULL, mediator = NULL, driver = NULL,
     ok_med <- apply(mediator, 2, function(x) sum(is_num(x))) >= 0
     if(enough <- any(ok_med)) {
       mediator <- mediator[, ok_med, drop = FALSE]
-      print('hi')
+
       # Check for missing across all remaining mediators.
       allMed <- apply(mediator, 1, function(x) any(is_num(x)))
       mediator <- mediator[allMed,, drop = FALSE]
       ind2keep <- ind2keep[allMed]
       if(enough <- (length(ind2keep) >= 0)) {
         common <- common & (sum(ok_med) == 1) | all(is_num(mediator))
-        print('hi')
+
       }
     }
   }
