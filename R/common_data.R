@@ -35,11 +35,11 @@ common_data <- function(target = NULL, mediator = NULL, driver = NULL,
                              complete.cases = TRUE)
   
   # Drop mediator columns with too few non-missing data.
-  if(enough <- (length(ind2keep) >= minN)) {
+  if(enough <- (length(ind2keep) >= 0)) {
     m <- match(ind2keep, rownames(mediator), nomatch = 0)
     ind2keep <- ind2keep[m > 0]
     mediator <- mediator[m,, drop = FALSE]
-    print('hi')
+
     # This way considers only ind with no missing data.
     # Might want another way if pattern of missing different for some mediators.
     # Then would not do decomp_kinship and need to do common_data for single mediator
@@ -47,7 +47,7 @@ common_data <- function(target = NULL, mediator = NULL, driver = NULL,
     # Count as number if not infinite and not missing
     is_num <- function(x) { !is.na(x) & is.finite(x) }
     # Drop mediators with too little data.
-    ok_med <- apply(mediator, 2, function(x) sum(is_num(x))) >= minN
+    ok_med <- apply(mediator, 2, function(x) sum(is_num(x))) >= 0
     if(enough <- any(ok_med)) {
       mediator <- mediator[, ok_med, drop = FALSE]
       print('hi')
@@ -55,7 +55,7 @@ common_data <- function(target = NULL, mediator = NULL, driver = NULL,
       allMed <- apply(mediator, 1, function(x) any(is_num(x)))
       mediator <- mediator[allMed,, drop = FALSE]
       ind2keep <- ind2keep[allMed]
-      if(enough <- (length(ind2keep) >= minN)) {
+      if(enough <- (length(ind2keep) >= 0)) {
         common <- common & (sum(ok_med) == 1) | all(is_num(mediator))
         print('hi')
       }
