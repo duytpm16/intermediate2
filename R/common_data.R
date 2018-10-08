@@ -2,7 +2,7 @@ common_data <- function(target = NULL, mediator = NULL, driver = NULL,
                         covar_tar = NULL, covar_med = NULL, kinship = NULL,
                         driver_med = NULL, intcovar = NULL,
                         common = TRUE,
-                        minN = 141, minCommon = 0.9, ...) {
+                        minN = 0, minCommon = 0.9, ...) {
 
   # Make sure all are matrices
   target <- convert_matrix(target, "T")
