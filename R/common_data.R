@@ -2,7 +2,7 @@ common_data <- function(target = NULL, mediator = NULL, driver = NULL,
                         covar_tar = NULL, covar_med = NULL, kinship = NULL,
                         driver_med = NULL, intcovar = NULL,
                         common = TRUE,
-                        minN = 0, minCommon = 0.9, ...) {
+                        minN = 100, minCommon = 0.9, ...) {
 
   # Make sure all are matrices
   target <- convert_matrix(target, "T")
@@ -35,7 +35,7 @@ common_data <- function(target = NULL, mediator = NULL, driver = NULL,
                              complete.cases = TRUE)
   
   # Drop mediator columns with too few non-missing data.
-  if(enough <- (length(ind2keep) >= 0)) {
+  if(enough <- (length(ind2keep) >= minN)) {
     m <- match(ind2keep, rownames(mediator), nomatch = 0)
     ind2keep <- ind2keep[m > 0]
     mediator <- mediator[m,, drop = FALSE]
@@ -47,7 +47,7 @@ common_data <- function(target = NULL, mediator = NULL, driver = NULL,
     # Count as number if not infinite and not missing
     is_num <- function(x) { !is.na(x) & is.finite(x) }
     # Drop mediators with too little data.
-    ok_med <- apply(mediator, 2, function(x) sum(is_num(x))) >= 0
+    ok_med <- apply(mediator, 2, function(x) sum(is_num(x))) >= minN
     if(enough <- any(ok_med)) {
       mediator <- mediator[, ok_med, drop = FALSE]
 
@@ -55,7 +55,7 @@ common_data <- function(target = NULL, mediator = NULL, driver = NULL,
       allMed <- apply(mediator, 1, function(x) any(is_num(x)))
       mediator <- mediator[allMed,, drop = FALSE]
       ind2keep <- ind2keep[allMed]
-      if(enough <- (length(ind2keep) >= 0)) {
+      if(enough <- (length(ind2keep) >= minN)) {
         common <- common & (sum(ok_med) == 1) | all(is_num(mediator))
 
       }
