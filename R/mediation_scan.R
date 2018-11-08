@@ -137,14 +137,18 @@ mediation_scan <- function(target, mediator,  driver,
         # List of mediators
         med_pur <- purrr::transpose(list(mediator = as.data.frame(mediator),
                                          annotation = split(annotation, rownames(annotation))))
+        stopifnot(names(med_pur) == rownames(annotation))
         
-        
+                                
+                                
+                                
         # Add mediation LOD to annotation
         output     <- annotation
         output$lod <- unlist(purrr::map(med_pur, mapfn, target, driver, covar, intcovar, loglik0)) / log(10)
-        output$names <- names(med_pur)
-        output$hello <- rep('hello',nrow(output))                        
+                      
         
+                                
+                                
         
         attr(output, "targetFit")  <- loglik0 / log(10)
         attr(output, "facet_name") <- facet_name
