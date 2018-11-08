@@ -81,11 +81,13 @@ mediation_scan <- function(target, mediator,  driver,
   
   
         
-        mapfn <- function(x, target, covar, driver, loglik0) {
+        mapfn <- function(x, target, driver, covar, intcovar, loglik0) {
         
           
                 # Get common data.
-                commons <- common_data(target = target, mediator = x$mediator, driver = driver, covar = covar, intcovar = intcovar)
+                commons <- common_data(target = target, mediator = x$mediator, 
+                                       driver = driver, 
+                                       covar = covar, intcovar = intcovar)
         
                 if(is.null(commons)){
                    return(NULL)
@@ -138,12 +140,12 @@ mediation_scan <- function(target, mediator,  driver,
         # List of mediators
         med_pur <- purrr::transpose(list(mediator = as.data.frame(mediator),
                                          annotation = split(annotation, rownames(annotation))))
-        View(names(med_pur))
+        
         
         # Add mediation LOD to annotation
         output     <- annotation
-        output$lod <- unlist(purrr::map(med_pur, mapfn, target, covar, driver, loglik0)) / log(10)
-        
+        output$lod <- unlist(purrr::map(med_pur, mapfn, target, driver, covar, intcovar, loglik0)) / log(10)
+        output$names <- names(med_pur)
         
         
         attr(output, "targetFit")  <- loglik0 / log(10)
