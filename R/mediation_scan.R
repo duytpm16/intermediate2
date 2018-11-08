@@ -85,9 +85,7 @@ mediation_scan <- function(target, mediator,  driver,
         
           
                 # Get common data.
-                commons <- common_data(target = target, mediator = x$mediator, 
-                                       driver = driver, 
-                                       covar = covar, intcovar = intcovar)
+                commons <- common_data(target, x$mediator, driver, covar, intcovar = intcovar)
         
                 if(is.null(commons)){
                    return(NULL)
