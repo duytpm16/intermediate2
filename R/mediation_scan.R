@@ -39,93 +39,134 @@
 #' 
 #' @export
 
-mediation_scan <- function(target, 
-                           mediator, 
-                           driver, 
-                           annotation,
-                           covar=NULL,
-                           intcovar=NULL,
-                           kinship = NULL,
-                           method=c("double-lod-diff", "ignore", "lod-diff"), 
-                           fitFunction = fitDefault,
-                           facet_name = "chr",
-                           index_name = "pos",
-                           verbose=TRUE) {
+mediation_scan <- function(target, mediator,  driver, 
+                           annotation, covar=NULL, intcovar=NULL,
+                           kinship = NULL, method=c("double-lod-diff", "ignore", "lod-diff"), 
+                           fitFunction = fitDefault, facet_name = "chr", index_name = "start", verbose=TRUE) {
   
-  # Make sure covariates are numeric
-  covar <- covar_df_mx(covar)
-  intcovar <- covar_df_mx(intcovar)
   
-  # Fit model without mediation.
-  if(length(dim(driver)) == 2)
-    driver_tar <- driver
-  else
-    driver_tar <- driver[,,1]
-  loglik0 <- fitFunction(driver_tar, target, kinship, covar, intcovar)$LR
   
-  # Get common data.
-  commons <- common_data(target, mediator, driver, covar, intcovar = intcovar)
-  if(is.null(commons))
-    return(NULL)
-  
-  target <- commons$target
-  mediator <- commons$mediator
-  driver <- commons$driver
-  covar <- commons$covar_tar
-  intcovar <- commons$intcovar
-  common <- commons$common
-  rm(commons)
-  
-  # check input
-  stopifnot(c(facet_name, index_name) %in% tolower(names(annotation)))
-  method = match.arg(method)
-  
-  # Match up annotation with mediators
-  stopifnot(all(!is.na(m <- match(colnames(mediator), annotation$id))))
-  annotation <- annotation[m,]
-  rownames(annotation) <- colnames(mediator)
-  
-  med_pur <- 
-    purrr::transpose(
-      list(mediator = as.data.frame(mediator),
-           annotation = split(annotation, rownames(annotation))))
-  lodfn <- 
-    switch(
-      method,
-      ignore            = function(loglik, loglik0) loglik[1],
-      "lod-diff"        = function(loglik, loglik0) loglik[2] - loglik[1],
-      "double-lod-diff" = function(loglik, loglik0) loglik0 - (loglik[2] - loglik[1]))
-  
-  mapfn <- function(x, target, covar, driver, loglik0) {
-    if(length(dim(driver)) > 2) {
-      if(is.null(dcol <- x$annotation$driver_names))
-        driver <- driver[,,1]
-      else
-        driver <- driver[,, dcol]
-    }
-    loglik <- c(fitFunction(driver, target, kinship,
-                            cbind(covar, x$mediator), intcovar)$LR,
-                fitFunction(driver, target, kinship,
-                            covar, intcovar)$LR)
-    lodfn(loglik, loglik0)
-  }
-  output <- annotation
-  # Compute LOD (fitFunction provides LL, so divide by log(10))
-  output$lod <- unlist(purrr::map(med_pur, mapfn, target, covar, driver, loglik0)) /
-    log(10)
-  attr(output, "targetFit") <- loglik0 / log(10)
-  attr(output, "facet_name") <- facet_name
-  attr(output, "index_name") <- index_name
-  class(output) <- c("mediation_scan", "data.frame")
-  return(output)
+
+        # Make sure covariates are numeric
+        covar    <- covar_df_mx(covar)
+        intcovar <- covar_df_mx(intcovar)
+        
+        
+        
+        
+        
+        
+        # Fit model without mediation.
+        if(length(dim(driver)) == 2){
+           driver_tar <- driver
+        }else{
+           driver_tar <- driver[,,1]
+        }
+        
+        
+        
+        
+        
+        loglik0 <- fitFunction(driver_tar, target, kinship, covar, intcovar)$LR
+        
+        
+        
+        
+        # Match up annotation with mediators
+        stopifnot(all(!is.na(m <- match(colnames(mediator), annotation$id))))
+        annotation <- annotation[m,]
+        rownames(annotation) <- colnames(mediator)
+        
+        # Check input
+        stopifnot(c(facet_name, index_name) %in% tolower(names(annotation)))
+        
+        
+        
+        mapfn <- function(x, target, covar, driver, loglik0) {
+        
+          
+                # Get common data.
+                commons <- common_data(target = target, mediator = x$mediator, driver = driver, covar = covar, kinship = kinship, intcovar = intcovar)
+        
+                if(is.null(commons)){
+                   return(NULL)
+                }
+        
+                
+                target   <- commons$target
+                mediator <- commons$mediator
+                driver   <- commons$driver
+                covar    <- commons$covar_tar
+                intcovar <- commons$intcovar
+                common   <- commons$common
+                rm(commons)
+        
+                
+                
+                method = match.arg(method)
+        
+      
+                lodfn <- switch(method,
+                                ignore            = function(loglik, loglik0) loglik[1],
+                                "lod-diff"        = function(loglik, loglik0) loglik[2] - loglik[1],
+                                "double-lod-diff" = function(loglik, loglik0) loglik0 - (loglik[2] - loglik[1]))
+        
+      
+                
+                
+                
+                if(length(dim(driver)) > 2){
+                   if(is.null(dcol <- x$annotation$driver_names))
+                      driver <- driver[,,1]
+                   else
+                      driver <- driver[,, dcol]
+                }
+        
+        
+                loglik <- c(fitFunction(driver, target, kinship,
+                                        cbind(covar, mediator), intcovar)$LR,
+                            fitFunction(driver, target, kinship,
+                                        covar, intcovar)$LR)
+                
+                
+                lodfn(loglik, loglik0)
+        }
+        
+        
+        # List of mediators
+        med_pur <- purrr::transpose(list(mediator = as.data.frame(mediator),
+                                         annotation = split(annotation, rownames(annotation))))
+        
+        
+        # Add mediation LOD to annotation
+        output     <- annotation
+        output$lod <- unlist(purrr::map(med_pur, mapfn, target, covar, driver, loglik0)) / log(10)
+        
+        
+        
+        attr(output, "targetFit")  <- loglik0 / log(10)
+        attr(output, "facet_name") <- facet_name
+        attr(output, "index_name") <- index_name
+        class(output) <- c("mediation_scan", "data.frame")
+        return(output)
 }
+
+
+
+
+
+
 #'
 #' @export
 subset.mediation_scan <- function(object, facets=NULL, ...) {
-  facet_name <- attr(object, "facet_name")
-  if(is.null(facets))
-    return(object)
-  
-  new_object <- object[object[[facet_name]] %in% facets,]
-  modify_object(object, new_object)
+        facet_name <- attr(object, "facet_name")
+        
+        
+        if(is.null(facets)){
+           return(object)
+        }
+        
+        
+        new_object <- object[object[[facet_name]] %in% facets,]
+        modify_object(object, new_object)
 }
