@@ -42,7 +42,7 @@
 mediation_scan <- function(target, mediator,  driver, 
                            annotation, covar=NULL, intcovar=NULL,
                            kinship = NULL, method=c("double-lod-diff", "ignore", "lod-diff"), 
-                           fitFunction = fitDefault, facet_name = "chr", index_name = "start", verbose=TRUE) {
+                           fitFunction = fitDefault, facet_name = "chr", index_name = "pos", verbose=TRUE) {
   
   
   
