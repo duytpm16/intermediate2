@@ -79,7 +79,7 @@ mediation_scan <- function(target, mediator,  driver,
 
         
   
-  
+        method = match.arg(method)
         
         mapfn <- function(x, target, driver, covar, intcovar, loglik0) {
         
@@ -99,10 +99,9 @@ mediation_scan <- function(target, mediator,  driver,
                 intcovar <- commons$intcovar
                 common   <- commons$common
                 rm(commons)
-        
-                
-                
-                method = match.arg(method)
+      
+          
+          
         
       
                 lodfn <- switch(method,
