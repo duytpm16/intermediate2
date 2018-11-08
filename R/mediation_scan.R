@@ -62,15 +62,12 @@ mediation_scan <- function(target, mediator,  driver,
         }else{
            driver_tar <- driver[,,1]
         }
-        
-        
-        
-        
-        
+
         loglik0 <- fitFunction(driver_tar, target, kinship, covar, intcovar)$LR
         
         
-        
+      
+  
         
         # Match up annotation with mediators
         stopifnot(all(!is.na(m <- match(colnames(mediator), annotation$id))))
@@ -81,6 +78,9 @@ mediation_scan <- function(target, mediator,  driver,
         stopifnot(c(facet_name, index_name) %in% tolower(names(annotation)))
         
         
+  
+  
+  
         
         mapfn <- function(x, target, covar, driver, loglik0) {
         
@@ -130,9 +130,12 @@ mediation_scan <- function(target, mediator,  driver,
                 
                 
                 lodfn(loglik, loglik0)
-        }
+        } # mapfn()
         
         
+                                
+                                
+                                
         # List of mediators
         med_pur <- purrr::transpose(list(mediator = as.data.frame(mediator),
                                          annotation = split(annotation, rownames(annotation))))
