@@ -68,17 +68,16 @@ mediation_scan <- function(target, mediator,  driver,
         
       
   
-        
+        # Check input
+        stopifnot(c(facet_name, index_name) %in% tolower(names(annotation)))
+  
         # Match up annotation with mediators
         stopifnot(all(!is.na(m <- match(colnames(mediator), annotation$id))))
         annotation <- annotation[m,]
         rownames(annotation) <- colnames(mediator)
         
-        # Check input
-        stopifnot(c(facet_name, index_name) %in% tolower(names(annotation)))
+
         
-        
-  
   
   
         
