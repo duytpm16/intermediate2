@@ -144,12 +144,15 @@ mediation_scan <- function(target, mediator,  driver,
         output     <- annotation
         output$lod <- unlist(purrr::map(med_pur, mapfn, target, driver, covar, intcovar, loglik0)) / log(10)
         output$names <- names(med_pur)
+        output$hello <- rep('hello',nrow(output))                        
         
         
         attr(output, "targetFit")  <- loglik0 / log(10)
         attr(output, "facet_name") <- facet_name
         attr(output, "index_name") <- index_name
         class(output) <- c("mediation_scan", "data.frame")
+        
+                                
         return(output)
 }
 
