@@ -138,7 +138,7 @@ mediation_scan <- function(target, mediator,  driver,
         # List of mediators
         med_pur <- purrr::transpose(list(mediator = as.data.frame(mediator),
                                          annotation = split(annotation, rownames(annotation))))
-        
+        print(names(med_pur))
         
         # Add mediation LOD to annotation
         output     <- annotation
